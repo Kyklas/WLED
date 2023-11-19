@@ -8,7 +8,8 @@
  */
 
 // version code in format yymmddb (b = daily build)
-#define VERSION 2310130
+// 2023 "Robototes 2412" Version
+#define VERSION 202302412
 
 //uncomment this if you have a "my_config.h" file you'd like to use
 //#define WLED_USE_MY_CONFIG
@@ -26,7 +27,7 @@
 // You can choose some of these features to disable:
 //#define WLED_DISABLE_ALEXA       // saves 11kb
 //#define WLED_DISABLE_HUESYNC     // saves 4kb
-//#define WLED_DISABLE_INFRARED    // saves 12kb, there is no pin left for this on ESP8266-01
+#define WLED_DISABLE_INFRARED    // saves 12kb, there is no pin left for this on ESP8266-01
 #ifndef WLED_DISABLE_MQTT
   #define WLED_ENABLE_MQTT         // saves 12kb
 #endif
@@ -331,7 +332,7 @@ WLED_GLOBAL byte bootPreset   _INIT(0);                   // save preset to load
 //if true, a segment per bus will be created on boot and LED settings save
 //if false, only one segment spanning the total LEDs is created,
 //but not on LED settings save if there is more than one segment currently
-WLED_GLOBAL bool autoSegments       _INIT(false);
+WLED_GLOBAL bool autoSegments       _INIT(true);
 #ifdef ESP8266
 WLED_GLOBAL bool useGlobalLedBuffer _INIT(false); // double buffering disabled on ESP8266
 #else
@@ -343,7 +344,7 @@ WLED_GLOBAL bool gammaCorrectCol    _INIT(true);  // use gamma correction on col
 WLED_GLOBAL bool gammaCorrectBri    _INIT(false); // use gamma correction on brightness
 WLED_GLOBAL float gammaCorrectVal   _INIT(2.8f);  // gamma correction value
 
-WLED_GLOBAL byte col[]    _INIT_N(({ 255, 160, 0, 0 }));  // current RGB(W) primary color. col[] should be updated if you want to change the color.
+WLED_GLOBAL byte col[]    _INIT_N(({ 190, 100, 50, 64 }));  // current RGB(W) primary color. col[] should be updated if you want to change the color.
 WLED_GLOBAL byte colSec[] _INIT_N(({ 0, 0, 0, 0 }));      // current RGB(W) secondary color
 WLED_GLOBAL byte briS     _INIT(128);                     // default brightness
 
@@ -370,7 +371,7 @@ WLED_GLOBAL NodesMap Nodes;
 WLED_GLOBAL bool nodeListEnabled _INIT(true);
 WLED_GLOBAL bool nodeBroadcastEnabled _INIT(true);
 
-WLED_GLOBAL byte buttonType[WLED_MAX_BUTTONS]  _INIT({BTN_TYPE_PUSH});
+WLED_GLOBAL byte buttonType[WLED_MAX_BUTTONS]  _INIT({BTNTYPE});
 #if defined(IRTYPE) && defined(IRPIN)
 WLED_GLOBAL byte irEnabled      _INIT(IRTYPE); // Infrared receiver
 #else

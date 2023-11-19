@@ -1162,16 +1162,28 @@ void WS2812FX::finalizeInit(void)
   if (busses.getNumBusses() == 0) {
     DEBUG_PRINTLN(F("No busses, init default"));
     const uint8_t defDataPins[] = {DATA_PINS};
+    const uint8_t defMultPins[] = {MULT_PINS};
     const uint16_t defCounts[] = {PIXEL_COUNTS};
-    const uint8_t defNumBusses = ((sizeof defDataPins) / (sizeof defDataPins[0]));
+    const uint8_t defTypes[] = {DEFAULT_LED_TYPE};
+    const uint8_t defNumPins = ((sizeof defDataPins) / (sizeof defDataPins[0]));
+    const uint8_t defNumMultPins = ((sizeof defMultPins) / (sizeof defMultPins[0]));
     const uint8_t defNumCounts = ((sizeof defCounts)   / (sizeof defCounts[0]));
+    const uint8_t defTypeCounts = ((sizeof defTypes)   / (sizeof defTypes[0]));
     uint16_t prevLen = 0;
-    for (uint8_t i = 0; i < defNumBusses && i < WLED_MAX_BUSSES+WLED_MIN_VIRTUAL_BUSSES; i++) {
-      uint8_t defPin[] = {defDataPins[i]};
+    for (uint8_t i = 0, pin = 0; i < defTypeCounts && i < WLED_MAX_BUSSES+WLED_MIN_VIRTUAL_BUSSES; i++) {
       uint16_t start = prevLen;
       uint16_t count = defCounts[(i < defNumCounts) ? i : defNumCounts -1];
+      uint8_t mult = defMultPins[(i < defNumMultPins) ? i : defNumMultPins -1];
+      uint8_t type = defTypes[i];
+      
+      
+      uint8_t defPin[mult] = {0};
+      // Allows to setup multi pins bus
+      for (uint8_t pin_idx = 0; pin_idx < mult; pin_idx++, pin++)
+        defPin[pin_idx] = defDataPins[(pin < defNumPins) ? pin : -1 ];
+
       prevLen += count;
-      BusConfig defCfg = BusConfig(DEFAULT_LED_TYPE, defPin, start, count, DEFAULT_LED_COLOR_ORDER, false, 0, RGBW_MODE_MANUAL_ONLY);
+      BusConfig defCfg = BusConfig(type, defPin, start, count, DEFAULT_LED_COLOR_ORDER, false, 0, RGBW_MODE_MANUAL_ONLY);
       if (busses.add(defCfg) == -1) break;
     }
   }
@@ -1521,7 +1533,7 @@ uint8_t WS2812FX::getActiveSegmentsNum(void) {
 }
 
 uint16_t WS2812FX::getLengthTotal(void) {
-  uint16_t len = Segment::maxWidth * Segment::maxHeight; // will be _length for 1D (see finalizeInit()) but should cover whole matrix for 2D
+  uint16_t len = Segment::maxWidth * Segment::maxHeight; // will be _length for 1D (see finalizeInit()) button should cover whole matrix for 2D
   if (isMatrix && _length > len) len = _length; // for 2D with trailing strip
   return len;
 }
