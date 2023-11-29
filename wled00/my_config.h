@@ -60,7 +60,16 @@
 #endif
 
 
+// Default config ESP32C3
+#ifndef BTNPIN
+#define BTNPIN 9,-1,-1,-1
+#define BTNTYPE BTN_TYPE_PUSH,0,0,0
+#endif
 
-
-
-
+// Default config ESP32C3
+#ifndef MULT_PINS
+#define PIXEL_COUNTS 25
+#define DATA_PINS 10
+#define MULT_PINS 1
+#define DEFAULT_LED_TYPE TYPE_WS2812_RGB
+#endif

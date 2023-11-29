@@ -446,6 +446,8 @@ void WLED::setup()
   WiFi.onEvent(WiFiEvent);
   #endif
 
+  Serial.println(SERVERNAME);
+
   #ifdef WLED_ENABLE_ADALIGHT
   //Serial RX (Adalight, Improv, Serial JSON) only possible if GPIO3 unused
   //Serial TX (Debug, Improv, Serial JSON) only possible if GPIO1 unused
