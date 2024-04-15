@@ -9,13 +9,15 @@
 #include "bus_wrapper.h"
 #include "bus_manager.h"
 
+#include "wled.h"
+
 //colors.cpp
 uint32_t colorBalanceFromKelvin(uint16_t kelvin, uint32_t rgb);
 uint16_t approximateKelvinFromRGB(uint32_t rgb);
 void colorRGBtoRGBW(byte* rgb);
 
 //udp.cpp
-uint8_t realtimeBroadcast(uint8_t type, IPAddress client, uint16_t length, byte *buffer, uint8_t bri=255, bool isRGBW=false);
+// uint8_t realtimeBroadcast(uint8_t type, IPAddress client, uint16_t length, byte *buffer, uint8_t bri=255, bool isRGBW=false);
 
 // enable additional debug output
 #if defined(WLED_DEBUG_HOST)
@@ -524,6 +526,102 @@ void BusNetwork::cleanup() {
   freeData();
 }
 
+// -------------------------------------------
+
+#define EXPANDER_LED_OFFSET 1
+
+//Write a byte to the IO expander
+void TCL59XXXWrite(byte address, byte *_data,size_t len) {
+
+    int ret;
+
+    DEBUG_PRINTF("TCL59xxx Write %d @ %02x : %02x %02x %02x %02x\n",
+    len,address,_data[0],_data[1],_data[2],_data[3]);
+
+    Wire.beginTransmission(address);
+    Wire.write(_data,len);
+    ret = Wire.endTransmission(); 
+
+    DEBUG_PRINTF("TCL59xxx Xfer : %d\n",ret);
+}
+
+BusExpander::BusExpander(BusConfig &bc)
+: Bus(bc.type, bc.start, bc.autoWhite, bc.count)
+, _showing(false)
+{
+  // TYPE_EXPANDER
+  _addr = 0x60;
+
+  if (i2c_sda<0 || i2c_scl<0) {
+    _valid = false;
+    return;
+  }
+
+  uint8_t config[17];
+
+  config[0]=0x00;
+  config[1]=0x00;
+  TCL59XXXWrite(_addr,config,2);
+
+  config[0]=0x01;
+  config[1]=0x00;
+  TCL59XXXWrite(_addr,config,2);
+
+  config[0]=0x94;
+  memset(config+1,0xAA,4);
+  TCL59XXXWrite(_addr,config,5);
+
+  config[0]=0x82;
+  memset(config+1,0x0,16);
+  TCL59XXXWrite(_addr,config,17);
+
+  _valid = (allocData(_len) != nullptr);
+  _data[0] = 0x82;
+}
+
+void BusExpander::setPixelColor(uint16_t pix, uint32_t c) {
+  if (!_valid || pix >= _len) return;
+  c = autoWhiteCalc(c);
+  if (_cct >= 1900) c = colorBalanceFromKelvin(_cct, c); //color correction from CCT
+  _data[pix + EXPANDER_LED_OFFSET]   = W(c);
+}
+
+uint32_t BusExpander::getPixelColor(uint16_t pix) {
+  if (!_valid || pix >= _len) return 0;
+  uint16_t offset = pix ;
+  return RGBW32(0, 0, 0, _data[pix + EXPANDER_LED_OFFSET]);
+}
+
+void BusExpander::show() {
+  if (!_valid || !canShow()) return;
+  _showing = true;
+
+  uint8_t  data_bri[17];
+
+  data_bri[0] = _data[0];
+  for(int idx  = 1 ; idx < 17 ; idx++ )
+  {
+    data_bri[idx]= (_data[idx] * _bri) / 255;
+  }
+
+  // Send I2C Expander data
+  TCL59XXXWrite(_addr,data_bri,17);
+  _showing = false;
+}
+
+uint8_t BusExpander::getPins(uint8_t* pinArray) {
+  pinArray[0] = _addr;
+  return 1;
+}
+
+void BusExpander::cleanup() {
+  _type = I_NONE;
+  _valid = false;
+  freeData();
+}
+
+// ---------------------------------------------
+
 
 //utility to get the approx. memory usage of a given BusConfig
 uint32_t BusManager::memUsage(BusConfig &bc) {
@@ -551,6 +649,8 @@ int BusManager::add(BusConfig &bc) {
   if (getNumBusses() - getNumVirtualBusses() >= WLED_MAX_BUSSES) return -1;
   if (bc.type >= TYPE_NET_DDP_RGB && bc.type < 96) {
     busses[numBusses] = new BusNetwork(bc);
+  } else if (bc.type >= TYPE_EXPANDER ) {
+    busses[numBusses] = new BusExpander(bc);
   } else if (IS_DIGITAL(bc.type)) {
     busses[numBusses] = new BusDigital(bc, numBusses, colorOrderMap);
   } else if (bc.type == TYPE_ONOFF) {

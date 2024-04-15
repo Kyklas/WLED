@@ -22,12 +22,56 @@
 #define CLIENT_PASS "Your_Password"
 */
 // Local Config, not committed
-// #include "my_config_local.h"
+#include "my_config_local.h"
 
 //#define LIGHT_PineTree 0
 //#define LIGHT_Mountain 1
 
 #define MAX_LEDS 255
+
+// Default
+#define LIGHT_RGB_COUNT 5
+#define MDNS_NAME "ESP32C3-DEV"
+#define SERVERNAME "ESP32C3-DEV"
+#define WLED_AP_SSID "ESP32C3-DEV-AP"
+
+// WIP TLC59116
+// i2ctransfer -f -y 1 w17@0x60 0x82 10 20 30 40 50 60 70 80 90 100 10 120 130 140 150 160
+// device tree : reg = <0x60>
+
+// #define USERMOD_TCL59XXX
+
+#define I2CSCLPIN 2
+#define I2CSDAPIN 3
+
+#define LIGHT_RGB_COUNT 5
+#define MDNS_NAME "AvaRing"
+#define SERVERNAME "AvaRing"
+#define WLED_AP_SSID "AvaRing-AP"
+
+
+#define BTNPIN 9,8,-1,-1
+#define BTNTYPE BTN_TYPE_PUSH,BTN_TYPE_PUSH,0,0
+
+#define PIXEL_COUNTS 10,1,1,1,1,16
+#define DATA_PINS 10,6,5,4,7,0x60
+#define MULT_PINS 1,1,1,1,1,1
+#define DEFAULT_LED_TYPE  TYPE_WS2812_RGB,TYPE_ANALOG_1CH,TYPE_ANALOG_1CH,TYPE_ANALOG_1CH,TYPE_ONOFF,TYPE_EXPANDER
+
+#if LIGHT_Bordie
+#define LIGHT_RGB_COUNT 5
+#define MDNS_NAME "BordieLight"
+#define SERVERNAME "BordieLight"
+#define WLED_AP_SSID "BordieLight-AP"
+
+#define BTNPIN 9,2,-1,-1
+#define BTNTYPE BTN_TYPE_PUSH,BTN_TYPE_PUSH,0,0
+
+#define PIXEL_COUNTS LIGHT_RGB_COUNT, 1, 1,
+#define DATA_PINS 10, 4, 6, 3, 7
+#define MULT_PINS 1, 1, 3
+#define DEFAULT_LED_TYPE TYPE_WS2812_RGB, TYPE_ANALOG_1CH, TYPE_ANALOG_3CH
+#endif
 
 #if LIGHT_Mountain
 #define LIGHT_RGB_COUNT 5

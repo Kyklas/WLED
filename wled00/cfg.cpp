@@ -129,6 +129,22 @@ bool deserializeConfig(JsonObject doc, bool fromFS) {
   }
   #endif
 
+  JsonArray hw_if_i2c = hw[F("if")][F("i2c-pin")];
+  CJSON(i2c_sda, hw_if_i2c[0]);
+  CJSON(i2c_scl, hw_if_i2c[1]);
+  PinManagerPinType i2c[2] = { { i2c_sda, true }, { i2c_scl, true } };
+  if (i2c_scl >= 0 && i2c_sda >= 0 && pinManager.allocateMultiplePins(i2c, 2, PinOwner::HW_I2C)) {
+    #ifdef ESP32
+    if (!Wire.setPins(i2c_sda, i2c_scl)) { i2c_scl = i2c_sda = -1; } // this will fail if Wire is initilised (Wire.begin() called prior)
+    else Wire.begin();
+    #else
+    Wire.begin(i2c_sda, i2c_scl);
+    #endif
+  } else {
+    i2c_sda = -1;
+    i2c_scl = -1;
+  }
+
   JsonArray ins = hw_led["ins"];
 
   if (fromFS || !ins.isNull()) {
@@ -301,21 +317,22 @@ bool deserializeConfig(JsonObject doc, bool fromFS) {
   if (serialBaud < 96 || serialBaud > 15000) serialBaud = 1152;
   updateBaudRate(serialBaud *100);
 
-  JsonArray hw_if_i2c = hw[F("if")][F("i2c-pin")];
-  CJSON(i2c_sda, hw_if_i2c[0]);
-  CJSON(i2c_scl, hw_if_i2c[1]);
-  PinManagerPinType i2c[2] = { { i2c_sda, true }, { i2c_scl, true } };
-  if (i2c_scl >= 0 && i2c_sda >= 0 && pinManager.allocateMultiplePins(i2c, 2, PinOwner::HW_I2C)) {
-    #ifdef ESP32
-    if (!Wire.setPins(i2c_sda, i2c_scl)) { i2c_scl = i2c_sda = -1; } // this will fail if Wire is initilised (Wire.begin() called prior)
-    else Wire.begin();
-    #else
-    Wire.begin(i2c_sda, i2c_scl);
-    #endif
-  } else {
-    i2c_sda = -1;
-    i2c_scl = -1;
-  }
+  // JsonArray hw_if_i2c = hw[F("if")][F("i2c-pin")];
+  // CJSON(i2c_sda, hw_if_i2c[0]);
+  // CJSON(i2c_scl, hw_if_i2c[1]);
+  // PinManagerPinType i2c[2] = { { i2c_sda, true }, { i2c_scl, true } };
+  // if (i2c_scl >= 0 && i2c_sda >= 0 && pinManager.allocateMultiplePins(i2c, 2, PinOwner::HW_I2C)) {
+  //   #ifdef ESP32
+  //   if (!Wire.setPins(i2c_sda, i2c_scl)) { i2c_scl = i2c_sda = -1; } // this will fail if Wire is initilised (Wire.begin() called prior)
+  //   else Wire.begin();
+  //   #else
+  //   Wire.begin(i2c_sda, i2c_scl);
+  //   #endif
+  // } else {
+  //   i2c_sda = -1;
+  //   i2c_scl = -1;
+  // }
+
   JsonArray hw_if_spi = hw[F("if")][F("spi-pin")];
   CJSON(spi_mosi, hw_if_spi[0]);
   CJSON(spi_sclk, hw_if_spi[1]);

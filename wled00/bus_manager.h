@@ -50,6 +50,7 @@ struct BusConfig {
     type = busType & 0x7F;  // bit 7 may be/is hacked to include refresh info (1=refresh in off state, 0=no refresh)
     size_t nPins = 1;
     if (type >= TYPE_NET_DDP_RGB && type < 96) nPins = 4; //virtual network bus. 4 "pins" store IP address
+    else if (type >= TYPE_EXPANDER) nPins=1; // pin store i2c address
     else if (type > 47) nPins = 2;
     else if (type > 40 && type < 46) nPins = NUM_PWM_PINS(type);
     for (size_t i = 0; i < nPins; i++) pins[i] = ppins[i];
@@ -300,6 +301,24 @@ class BusNetwork : public Bus {
     bool      _broadcastLock;
 };
 
+class BusExpander : public Bus {
+  public:
+    BusExpander(BusConfig &bc);
+    ~BusExpander() { cleanup(); }
+
+    bool hasRGB()   { return false; }
+    bool hasWhite() { return true; }
+    bool canShow()  { return !_showing; }
+    void setPixelColor(uint16_t pix, uint32_t c);
+    uint32_t getPixelColor(uint16_t pix);
+    uint8_t  getPins(uint8_t* pinArray);
+    void show();
+    void cleanup();
+
+  private:
+    uint8_t   _addr;
+    bool      _showing;
+};
 
 class BusManager {
   public:
