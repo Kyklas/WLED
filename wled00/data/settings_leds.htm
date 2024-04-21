@@ -59,7 +59,8 @@
 				if (nm == "L0" || nm == "L1" || nm == "L2" || nm == "L3") {
 					var n = LCs[i].name.substring(2);
 					var t = parseInt(d.getElementsByName("LT" + n)[0].value, 10); // LED type SELECT
-					if (t >= 80) continue;
+					if (t >= 80) continue; // ignore IP address
+					if (t >= 60) continue; // ignore I2C address
 				}
 				//check for pin conflicts
 				if (nm == "L0" || nm == "L1" || nm == "L2" || nm == "L3" || nm == "L4"/* || nm=="RL" || nm=="BT" || nm=="IR"*/)
@@ -168,8 +169,8 @@
 				// is the field a LED type?
 				var n = s.name.substring(2);
 				var t = parseInt(s.value);
-				gId("p0d" + n).innerHTML = (t >= 80 && t < 96) ? "IP address:" : (t > 49) ? "Data GPIO:" : (t > 41) ? "GPIOs:" : "GPIO:";
-				gId("p1d" + n).innerHTML = (t > 49 && t < 64) ? "Clk GPIO:" : "";
+				gId("p0d" + n).innerHTML = (t >= 80 && t < 96) ? "IP address:" : (t >= 60) ? "I2C Address:" : (t > 49) ? "Data GPIO:" : (t > 41) ? "GPIOs:" : "GPIO:";
+				gId("p1d" + n).innerHTML = (t > 49 && t < 60) ? "Clk GPIO:" : "";
 				//var LK = d.getElementsByName("L1"+n)[0]; // clock pin
 
 				memu += getMem(t, n); // calc memory
@@ -178,7 +179,7 @@
 				for (p = 1; p < 5; p++) {
 					var LK = d.getElementsByName("L" + p + n)[0]; // secondary pins
 					if (!LK) continue;
-					if (((t >= 80 && t < 96) && p < 4) || (t > 49 && p == 1) || (t > 41 && t < 50 && (p + 40 < t))) // TYPE_xxxx values from const.h
+					if (((t >= 80 && t < 96) && p < 4) || (t < 60 && t > 49 && p == 1) || (t > 41 && t < 50 && (p + 40 < t))) // TYPE_xxxx values from const.h
 					{
 						// display pin field
 						LK.style.display = "inline";
@@ -196,7 +197,7 @@
 				}
 				gId("rf" + n).onclick = (t == 31) ? (() => { return false }) : (() => { });  // prevent change for TM1814
 				gRGBW |= isRGBW = ((t > 17 && t < 22) || (t > 28 && t < 32) || (t > 40 && t < 46 && t != 43) || t == 88); // RGBW checkbox, TYPE_xxxx values from const.h
-				gId("co" + n).style.display = ((t >= 80 && t < 96) || (t >= 40 && t < 48)) ? "none" : "inline";  // hide color order for PWM
+				gId("co" + n).style.display = ((t >= 80 && t < 96) || (t >= 40 && t < 48) || (t == 60)) ? "none" : "inline";  // hide color order for PWM
 				gId("dig" + n + "w").style.display = (t > 28 && t < 32) ? "inline" : "none";  // show swap channels dropdown
 				if (!(t > 28 && t < 32)) d.getElementsByName("WO" + n)[0].value = 0; // reset swapping
 				gId("dig" + n + "c").style.display = (t >= 40 && t < 48) ? "none" : "inline";  // hide count for analog
@@ -204,7 +205,7 @@
 				gId("dig" + n + "s").style.display = ((t >= 80 && t < 96) || (t >= 40 && t < 48)) ? "none" : "inline";  // hide skip 1st for virtual & analog
 				gId("dig" + n + "f").style.display = ((t >= 16 && t < 32) || (t >= 50 && t < 64)) ? "inline" : "none";  // hide refresh
 				gId("dig" + n + "a").style.display = (isRGBW && t != 40) ? "inline" : "none";  // auto calculate white
-				gId("dig" + n + "l").style.display = (t > 48 && t < 64) ? "inline" : "none";  // bus clock speed
+				gId("dig" + n + "l").style.display = (t > 48 && t < 60) ? "inline" : "none";  // bus clock speed
 				gId("rev" + n).innerHTML = (t >= 40 && t < 48) ? "Inverted output" : "Reversed (rotated 180°)";  // change reverse text for analog
 				gId("psd" + n).innerHTML = (t >= 40 && t < 48) ? "Index:" : "Start:";    // change analog start description
 			});
@@ -247,7 +248,13 @@
 						LCs[i].min = 0;
 						LCs[i].style.color = "#fff";
 						continue; // do not check conflicts
-					} else {
+					} else if (t >= 60) {
+						LCs[i].max = 127; // I2C Addresses
+						LCs[i].min = 0;
+						LCs[i].style.color = "#fff";
+						continue; // do not check conflicts
+					}
+					else {
 						LCs[i].max = d.max_gpio;
 						LCs[i].min = -1;
 					}
@@ -352,7 +359,7 @@ ${i + 1}:
 <option value="44">PWM RGBW</option>\
 <option value="45">PWM RGB+CCT</option>\
 <!--option value="46">PWM RGB+DCCT</option-->'}
-<option value="60">Expander</option>
+<option value="60">I2C Exp TCL59118</option>
 <option value="80">DDP RGB (network)</option>
 <!--option value="81">E1.31 RGB (network)</option-->
 <option value="82">Art-Net RGB (network)</option>

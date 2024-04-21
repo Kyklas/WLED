@@ -528,68 +528,82 @@ void BusNetwork::cleanup() {
 
 // -------------------------------------------
 
-#define EXPANDER_LED_OFFSET 1
-
 //Write a byte to the IO expander
-void TCL59XXXWrite(byte address, byte *_data,size_t len) {
+int TCL59XXXWrite(byte address, byte *_data,size_t len) {
 
     int ret;
 
-    DEBUG_PRINTF("TCL59xxx Write %d @ %02x : %02x %02x %02x %02x\n",
-    len,address,_data[0],_data[1],_data[2],_data[3]);
+    // DEBUG_PRINTF("TCL59xxx Write %d @ %02x : %02x %02x %02x %02x\n",
+    // len,address,_data[0],_data[1],_data[2],_data[3]);
 
     Wire.beginTransmission(address);
     Wire.write(_data,len);
     ret = Wire.endTransmission(); 
 
-    DEBUG_PRINTF("TCL59xxx Xfer : %d\n",ret);
+    // DEBUG_PRINTF("TCL59xxx Xfer : %d\n",ret);
+
+    return ret;
 }
 
 BusExpander::BusExpander(BusConfig &bc)
 : Bus(bc.type, bc.start, bc.autoWhite, bc.count)
 , _showing(false)
 {
+  int ret;
+  uint8_t config[17];
+
   // TYPE_EXPANDER
-  _addr = 0x60;
+  _addr = bc.pins[0] ;
+
+  _valid = false;
+
+  DEBUG_PRINTF("BusExpander addr: %02x led count %d\n",_addr,_len);
 
   if (i2c_sda<0 || i2c_scl<0) {
-    _valid = false;
     return;
   }
 
-  uint8_t config[17];
-
   config[0]=0x00;
   config[1]=0x00;
-  TCL59XXXWrite(_addr,config,2);
+  ret = TCL59XXXWrite(_addr,config,2);
+
+  if (ret)
+  {
+    DEBUG_PRINTF("BusExpander addr: %02x Write Error: %d\n",_addr,ret);
+  }
 
   config[0]=0x01;
   config[1]=0x00;
-  TCL59XXXWrite(_addr,config,2);
+  ret = TCL59XXXWrite(_addr,config,2);
+
+  if (ret)
+  {
+    DEBUG_PRINTF("BusExpander addr: %02x Write Error: %d\n",_addr,ret);
+    return;
+  }
 
   config[0]=0x94;
   memset(config+1,0xAA,4);
-  TCL59XXXWrite(_addr,config,5);
+  ret = TCL59XXXWrite(_addr,config,5);
 
   config[0]=0x82;
   memset(config+1,0x0,16);
   TCL59XXXWrite(_addr,config,17);
 
   _valid = (allocData(_len) != nullptr);
-  _data[0] = 0x82;
 }
 
 void BusExpander::setPixelColor(uint16_t pix, uint32_t c) {
   if (!_valid || pix >= _len) return;
   c = autoWhiteCalc(c);
   if (_cct >= 1900) c = colorBalanceFromKelvin(_cct, c); //color correction from CCT
-  _data[pix + EXPANDER_LED_OFFSET]   = W(c);
+  _data[pix]   = W(c);
 }
 
 uint32_t BusExpander::getPixelColor(uint16_t pix) {
   if (!_valid || pix >= _len) return 0;
   uint16_t offset = pix ;
-  return RGBW32(0, 0, 0, _data[pix + EXPANDER_LED_OFFSET]);
+  return RGBW32(0, 0, 0, _data[pix]);
 }
 
 void BusExpander::show() {
@@ -598,10 +612,10 @@ void BusExpander::show() {
 
   uint8_t  data_bri[17];
 
-  data_bri[0] = _data[0];
+  data_bri[0] = 0x82;
   for(int idx  = 1 ; idx < 17 ; idx++ )
   {
-    data_bri[idx]= (_data[idx] * _bri) / 255;
+    data_bri[idx]= (_data[idx-1] * _bri) / 255;
   }
 
   // Send I2C Expander data
@@ -615,6 +629,7 @@ uint8_t BusExpander::getPins(uint8_t* pinArray) {
 }
 
 void BusExpander::cleanup() {
+  DEBUG_PRINTLN(F("BusExpander Cleanup.\n"));
   _type = I_NONE;
   _valid = false;
   freeData();

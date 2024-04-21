@@ -152,6 +152,7 @@ class Bus {
       if ((type >= TYPE_WS2812_1CH && type <= TYPE_WS2812_WWA) || type == TYPE_SK6812_RGBW || type == TYPE_TM1814) return true; // digital types with white channel
       if (type > TYPE_ONOFF && type <= TYPE_ANALOG_5CH && type != TYPE_ANALOG_3CH) return true; // analog types with white channel
       if (type == TYPE_NET_DDP_RGBW) return true; // network types with white channel
+      if (type == TYPE_EXPANDER) return true; // expander types with white channel
       return false;
     }
     virtual bool hasCCT(void) { return Bus::hasCCT(_type); }
@@ -356,7 +357,10 @@ class BusManager {
 
     inline uint8_t getNumVirtualBusses() {
       int j = 0;
-      for (int i=0; i<numBusses; i++) if (busses[i]->getType() >= TYPE_NET_DDP_RGB && busses[i]->getType() < 96) j++;
+      for (int i=0; i<numBusses; i++) {
+        if (busses[i]->getType() >= TYPE_NET_DDP_RGB && busses[i]->getType() < 96) j++;
+        if (busses[i]->getType() == TYPE_EXPANDER ) j++;
+      }
       return j;
     }
 };
