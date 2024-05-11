@@ -5,15 +5,15 @@
     ],
     "vid": 202302412,
     "id": {
-        "mdns": "PineTreeLight",
-        "name": "PineTreeLight",
-        "inv": "PineTree"
+        "mdns": "AvaRing",
+        "name": "AvaRing",
+        "inv": "Light"
     },
     "nw": {
         "ins": [
             {
-                "ssid": "Your_Network",
-                "pskl": 0,
+                "ssid": "SBS-2.4",
+                "pskl": 8,
                 "ip": [
                     0,
                     0,
@@ -36,7 +36,7 @@
         ]
     },
     "ap": {
-        "ssid": "PineTreeLight-AP",
+        "ssid": "AvaRing-AP",
         "pskl": 8,
         "chan": 1,
         "hide": 0,
@@ -53,7 +53,7 @@
     },
     "hw": {
         "led": {
-            "total": 13,
+            "total": 30,
             "maxpwr": 850,
             "ledma": 55,
             "cct": false,
@@ -62,50 +62,7 @@
             "fps": 42,
             "rgbwm": 255,
             "ld": true,
-            "ins": [
-                {
-                    "start": 0,
-                    "len": 11,
-                    "pin": [
-                        10
-                    ],
-                    "order": 0,
-                    "rev": false,
-                    "skip": 0,
-                    "type": 22,
-                    "ref": false,
-                    "rgbwm": 0,
-                    "freq": 0
-                },
-                {
-                    "start": 11,
-                    "len": 1,
-                    "pin": [
-                        4
-                    ],
-                    "order": 1,
-                    "rev": false,
-                    "skip": 0,
-                    "type": 41,
-                    "ref": false,
-                    "rgbwm": 0,
-                    "freq": 19531
-                },
-                {
-                    "start": 12,
-                    "len": 1,
-                    "pin": [
-                        8
-                    ],
-                    "order": 1,
-                    "rev": false,
-                    "skip": 0,
-                    "type": 41,
-                    "ref": false,
-                    "rgbwm": 0,
-                    "freq": 19531
-                }
-            ]
+            "ins": []
         },
         "com": [],
         "btn": {
@@ -124,9 +81,9 @@
                     ]
                 },
                 {
-                    "type": 0,
+                    "type": 2,
                     "pin": [
-                        -1
+                        8
                     ],
                     "macros": [
                         0,
@@ -172,8 +129,8 @@
         "baud": 1152,
         "if": {
             "i2c-pin": [
-                -1,
-                -1
+                3,
+                2
             ],
             "spi-pin": [
                 -1,
@@ -207,7 +164,7 @@
     "def": {
         "ps": 1,
         "on": true,
-        "bri": 64
+        "bri": 128
     },
     "if": {
         "sync": {
@@ -254,7 +211,7 @@
             "offset": 0
         },
         "va": {
-            "alexa": true,
+            "alexa": false,
             "macros": [
                 0,
                 0
@@ -267,10 +224,10 @@
             "port": 1883,
             "user": "",
             "pskl": 0,
-            "cid": "WLED-PineTree",
+            "cid": "",
             "rtn": false,
             "topics": {
-                "device": "wled/pinetree",
+                "device": "",
                 "group": "wled/all"
             }
         },

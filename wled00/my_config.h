@@ -41,6 +41,8 @@
 
 // #define USERMOD_TCL59XXX
 
+#if LIGHT_DomeLight
+
 #define I2CSCLPIN 2
 #define I2CSDAPIN 3
 
@@ -48,7 +50,6 @@
 #define MDNS_NAME "DomeLight"
 #define SERVERNAME "DomeLight"
 #define WLED_AP_SSID "DomeLight-AP"
-
 
 #define BTNPIN 9,8,-1,-1
 #define BTNTYPE BTN_TYPE_PUSH,BTN_TYPE_PUSH,0,0
@@ -59,6 +60,8 @@
 #define DEFAULT_LED_TYPE  TYPE_WS2812_RGB,TYPE_ANALOG_1CH,TYPE_ANALOG_1CH,TYPE_ANALOG_1CH,TYPE_EXPANDER
 
 #define RLYPIN 7
+
+#endif
 
 #if LIGHT_Bordie
 #define LIGHT_RGB_COUNT 5

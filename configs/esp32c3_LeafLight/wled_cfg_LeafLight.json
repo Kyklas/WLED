@@ -5,15 +5,15 @@
     ],
     "vid": 202302412,
     "id": {
-        "mdns": "PineTreeLight",
-        "name": "PineTreeLight",
-        "inv": "PineTree"
+        "mdns": "MountainLight",
+        "name": "LeafLight",
+        "inv": "Mountain"
     },
     "nw": {
         "ins": [
             {
-                "ssid": "Your_Network",
-                "pskl": 0,
+                "ssid": "SBS-2.4",
+                "pskl": 8,
                 "ip": [
                     0,
                     0,
@@ -36,7 +36,7 @@
         ]
     },
     "ap": {
-        "ssid": "PineTreeLight-AP",
+        "ssid": "MountainLight-AP",
         "pskl": 8,
         "chan": 1,
         "hide": 0,
@@ -53,7 +53,7 @@
     },
     "hw": {
         "led": {
-            "total": 13,
+            "total": 7,
             "maxpwr": 850,
             "ledma": 55,
             "cct": false,
@@ -65,7 +65,7 @@
             "ins": [
                 {
                     "start": 0,
-                    "len": 11,
+                    "len": 5,
                     "pin": [
                         10
                     ],
@@ -78,29 +78,32 @@
                     "freq": 0
                 },
                 {
-                    "start": 11,
+                    "start": 5,
                     "len": 1,
                     "pin": [
-                        4
+                        4,
+                        5
                     ],
                     "order": 1,
                     "rev": false,
                     "skip": 0,
-                    "type": 41,
+                    "type": 42,
                     "ref": false,
                     "rgbwm": 0,
                     "freq": 19531
                 },
                 {
-                    "start": 12,
+                    "start": 6,
                     "len": 1,
                     "pin": [
-                        8
+                        6,
+                        3,
+                        7
                     ],
                     "order": 1,
                     "rev": false,
                     "skip": 0,
-                    "type": 41,
+                    "type": 43,
                     "ref": false,
                     "rgbwm": 0,
                     "freq": 19531
@@ -124,9 +127,9 @@
                     ]
                 },
                 {
-                    "type": 0,
+                    "type": 2,
                     "pin": [
-                        -1
+                        2
                     ],
                     "macros": [
                         0,
@@ -267,10 +270,10 @@
             "port": 1883,
             "user": "",
             "pskl": 0,
-            "cid": "WLED-PineTree",
+            "cid": "WLED-MountainLight",
             "rtn": false,
             "topics": {
-                "device": "wled/pinetree",
+                "device": "wled/mountainlight",
                 "group": "wled/all"
             }
         },
@@ -284,9 +287,9 @@
                 "col": true
             },
             "ip": [
-                0,
-                0,
-                0,
+                192,
+                168,
+                11,
                 0
             ]
         },
