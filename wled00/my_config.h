@@ -60,6 +60,21 @@
 #endif
 
 
+#if LIGHT_Bordie
+#define LIGHT_RGB_COUNT 6
+#define MDNS_NAME "BordieLight"   
+#define SERVERNAME "BordieLight"
+#define WLED_AP_SSID "BordieLight-AP"
+
+#define BTNPIN 2,-1,-1,-1
+#define BTNTYPE BTN_TYPE_PUSH,0,0,0
+
+#define PIXEL_COUNTS LIGHT_RGB_COUNT, 1, 1,
+#define DATA_PINS 10, 4, 6
+#define MULT_PINS 1, 1, 1
+#define DEFAULT_LED_TYPE TYPE_WS2812_RGB, TYPE_ANALOG_1CH, TYPE_ANALOG_1CH
+#endif
+
 // Default config ESP32C3
 #ifndef BTNPIN
 #define BTNPIN 9,-1,-1,-1
