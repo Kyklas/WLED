@@ -851,6 +851,44 @@ BusHub75Matrix::BusHub75Matrix(BusConfig &bc) : Bus(bc.type, bc.start, bc.autoWh
   mxconfig.gpio.d = 21;
   mxconfig.gpio.e = 12;
 
+#elif defined(ESP32_TIDBYT_PINOUT)
+  USER_PRINTLN("MatrixPanel_I2S_DMA - TIDBYT Map");
+  /*
+   See TIDBIT HDK
+  */
+  mxconfig.gpio.r1 = 21;
+  mxconfig.gpio.g1 = 2;
+  mxconfig.gpio.b1 = 22;
+  mxconfig.gpio.r2 = 23;
+  mxconfig.gpio.g2 = 4;
+  mxconfig.gpio.b2 = 27;
+
+  mxconfig.gpio.lat = 19;
+  mxconfig.gpio.oe  = 32;
+  mxconfig.gpio.clk = 33;
+
+  mxconfig.gpio.a = 26;
+  mxconfig.gpio.b = 5;
+  mxconfig.gpio.c = 25;
+  mxconfig.gpio.d = 18;
+  mxconfig.gpio.e = -1; // assign to pin 14 if using more than two panels
+
+  // From https://github.com/tidbyt/hdk/blob/main/src/display.cpp#L52C8-L52C27
+  // Need invert_clock_phase
+
+  mxconfig.driver = HUB75_I2S_CFG::FM6126A;
+  // mxconfig.double_buff = true;
+  mxconfig.i2sspeed = HUB75_I2S_CFG::HZ_10M;
+
+  // Pin available on J6
+  // J6 1 - GND
+  // J6 2 - IO14 Pull Up
+  // J6 4 - IO13 Pull Up
+  // J6 7 - IO12
+  // J6 8 - IO35 ( input only )
+  // J6 9 - VCC 3.3v
+  // J6 10 - IO34 ( input only )
+
 #else
   USER_PRINTLN("MatrixPanel_I2S_DMA - Default pins");
   /*

@@ -17,6 +17,8 @@
 #define USERMOD_DALLASTEMPERATURE_MEASUREMENT_INTERVAL 60000
 #endif
 
+float DALLASTEMPERATURE_Temp=0.0f;
+
 class UsermodTemperature : public Usermod {
 
   private:
@@ -146,6 +148,7 @@ void UsermodTemperature::readTemperature() {
   //DEBUG_PRINTF("Read temperature %2.1f.\n", temperature); // does not work properly on 8266
   DEBUG_PRINT(F("Read temperature "));
   DEBUG_PRINTLN(temperature);
+  DALLASTEMPERATURE_Temp = temperature;
 }
 
 bool UsermodTemperature::findSensor() {
